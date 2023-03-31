@@ -1,0 +1,163 @@
+pimcore:
+    assets:
+        frontend_prefixes:
+            source: https://s3.us-east-1.amazonaws.com/dclmbox/pimcore-dam/asset
+            thumbnail: https://s3.us-east-1.amazonaws.com/dclmbox/pimcore-dam/thumbnail
+
+services:
+    assets_s3:
+        class: 'Aws\S3\S3Client'
+        arguments:
+            -  endpoint: 'https://s3.us-east-1.amazonaws.com'
+               region: 'us-east-1'
+               version: 'latest'
+               credentials:
+                  key: '%env(S3_STORAGE_KEY)%'
+                  secret: '%env(S3_STORAGE_SECRET)%'
+
+flysystem:
+    storages:
+        pimcore.asset.storage:
+            adapter: 'aws'
+            visibility: public
+            options:
+                client: 'assets_s3'
+                bucket: 'dclmbox'
+                prefix: pimcore-dam/asset
+
+        pimcore.asset_cache.storage:
+            # Storage for cached asset files, e.g. PDF and image files generated out of Office files or videos
+            # which are then used by the thumbnail engine as source files
+            adapter: 'aws'
+            visibility: private
+            options:
+                client: 'assets_s3'
+                bucket: 'dclmbox'
+                prefix: pimcore-dam/asset_cache
+
+        pimcore.thumbnail.storage:
+            # Storage for image and video thumbnails, directory structure is equal to the source asset tree
+            adapter: 'aws'
+            visibility: public
+            options:
+                client: 'assets_s3'
+                bucket: 'dclmbox'
+                prefix: pimcore-dam/thumbnails
+
+        pimcore.version.storage:
+            # Storage for serialized versioning data of documents/asset/data objects
+            adapter: 'aws'
+            visibility: private
+            options:
+                client: 'assets_s3'
+                bucket: 'dclmbox'
+                prefix: pimcore-dam/versions
+
+        pimcore.recycle_bin.storage:
+            # Storage for serialized recycle bin data of documents/asset/data objects
+            adapter: 'aws'
+            visibility: private
+            options:
+                client: 'assets_s3'
+                bucket: 'dclmbox'
+                prefix: pimcore-dam/recyclebin
+
+        pimcore.admin.storage:
+            # Storage for shared admin resources, such as the user avatar, custom logos, ...
+            adapter: 'aws'
+            visibility: private
+            options:
+                client: 'assets_s3'
+                bucket: 'dclmbox'
+                prefix: pimcore-dam/admin
+
+
+        # Migrate storage, assets, caches, thumbnails to s3...
+        pimcore.asset.storage.source:
+            adapter: 'local'
+            visibility: public
+            options:
+                directory: '%kernel.project_dir%/public/var/assets'
+
+        pimcore.asset.storage.target:
+            adapter: 'aws'
+            visibility: public
+            options:
+                client: 'assets_s3'
+                bucket: 'dclmbox'
+                prefix: pimcore-dam/asset
+
+        pimcore.asset_cache.storage.source:
+            adapter: 'local'
+            visibility: public
+            options:
+                directory: '%kernel.project_dir%/public/var/tmp/asset-cache'
+
+        pimcore.asset_cache.storage.target:
+            adapter: 'aws'
+            visibility: public
+            options:
+                client: 'assets_s3'
+                bucket: 'dclmbox'
+                prefix: pimcore-dam/asset
+
+        pimcore.thumbnail.storage.source:
+            adapter: 'local'
+            visibility: public
+            options:
+                directory: '%kernel.project_dir%/public/var/tmp/thumbnails'
+                permissions:
+                    file:
+                        private: 0644
+                    dir:
+                        private: 0755
+
+        pimcore.thumbnail.storage.target:
+            adapter: 'aws'
+            visibility: public
+            options:
+                client: 'assets_s3'
+                bucket: 'dclmbox'
+                prefix: pimcore-dam/thumbnails
+
+        pimcore.version.storage.source:
+            adapter: 'local'
+            visibility: private
+            options:
+                directory: '%kernel.project_dir%/var/versions'
+
+        pimcore.version.storage.target:
+            adapter: 'aws'
+            visibility: private
+            options:
+                client: 'assets_s3'
+                bucket: 'dclmbox'
+                prefix: pimcore-dam/versions
+
+        pimcore.recycle_bin.storage.source:
+            adapter: 'local'
+            visibility: private
+            options:
+                directory: '%kernel.project_dir%/var/recyclebin'
+
+        pimcore.recycle_bin.storage.target:
+            adapter: 'aws'
+            visibility: private
+            options:
+                client: 'assets_s3'
+                bucket: 'dclmbox'
+                prefix: pimcore-dam/recyclebin
+
+        pimcore.admin.storage.source:
+            adapter: 'local'
+            visibility: private
+            options:
+                directory: '%kernel.project_dir%/var/admin'
+
+        pimcore.admin.storage.target:
+            adapter: 'aws'
+            visibility: private
+            options:
+                client: 'assets_s3'
+                bucket: 'dclmbox'
+                prefix: pimcore-dam/admin
