@@ -1,9 +1,27 @@
+# https://makefiletutorial.com/
+
+# load .env file
+include ./src/.env
+
 repo:
-	@echo "\033[31mPlease enter repo name: \033[0m "; \
-	git init && git add . && git commit -m "DCLM DAM"; \
-	read -r repo; \
-	gh repo create dclmict/$$repo --public --source=. --remote=origin; \
-	git push --set-upstream origin main
+	@if [ -d .git ]; then \
+		echo "\033[31mPlease enter github repo name: \033[0m "; \
+		read -r repo; \
+		gh repo create dclmict/$$repo --public --source=. --remote=origin; \
+		echo "\033[31m Enter commit message\033[0m"; \
+		read -r cm; \
+		git add . && git commit -m '$$cm'; \
+		git push --set-upstream origin main; \
+	else \
+		echo "\033[31mPlease enter github repo name: \033[0m "; \
+		git init && git add . && git commit -m "DCLM DAM"; \
+		read -r repo; \
+		gh repo create dclmict/$$repo --public --source=. --remote=origin; \
+		echo "\033[31m Enter commit message\033[0m"; \
+		read -r cm; \
+		git add . && git commit -m '$$cm'; \
+		git push --set-upstream origin main; \
+	fi
 
 git:
 	@if git status --porcelain | grep -q '^??'; then \
@@ -48,48 +66,54 @@ git:
 	fi
 
 build:
-	@if docker images | grep -q opeoniye/dclm-academy; then \
-		echo "Removing \033[31mopeoniye/dclm-academy\033[0m image"; \
+	@if docker images | grep -q $(DIN); then \
+		echo "Removing \033[31m$(DIN)\033[0m image"; \
 		echo y | docker image prune --filter="dangling=true"; \
-		docker image rm opeoniye/dclm-academy; \
-		echo "Building \033[31mopeoniye/dclm-academy\033[0m image"; \
-		docker build -t opeoniye/dclm-academy:latest .; \
-		docker images | grep opeoniye/dclm-academy; \
+		docker image rm $(DIN); \
+		echo "Building \033[31m$(DIN):$(DIV)\033[0m image"; \
+		docker build -t $(DIN):$(DIV) .; \
+		docker images | grep $(DIN); \
 	else \
-		echo "Building \033[31mopeoniye/dclm-academy\033[0m image"; \
-		docker build -t opeoniye/dclm-academy:latest .; \
-		docker images | grep opeoniye/dclm-academy; \
+		echo "Building \033[31m$(DIN):$(DIV)\033[0m image"; \
+		docker build -t $(DIN):$(DIV) .; \
+		docker images | grep $(DIN); \
 	fi
 
 push:
-	cat ops/docker/pin | docker login -u opeoniye --password-stdin
-	docker push opeoniye/dclm-academy:latest
+	cp ./ops/.env.dev ./src/.env
+	${DLP} | docker login -u opeoniye --password-stdin
+	docker push $(DIN):$(DIV)
 
 dev:
 	cp ./ops/.env.dev ./src/.env
 	cp ./docker-dev.yml ./src/docker-compose.yml
+	cp -f ops/config-dev.yaml src/config/packages/dev/config.yaml
 	docker compose -f ./src/docker-compose.yml --env-file ./src/.env up -d
 
 prod:
-	@if ls /var/docker | grep -q dclm-academy; then \
+	@if ls /var/docker | grep -q dclm-dam; then \
 		echo "\033[31mDirectory exists, starting container...\033[0m"; \
 		touch ops/.env.prod; \
 		echo "\033[32mPaste .env content and save with :wq\033[0m"; \
 		vim ops/.env.prod; \
 		cp ./ops/.env.prod ./src/.env; \
 		cp ./docker-prod.yml ./src/docker-compose.yml; \
+		cp -f ops/config-prod.yaml src/config/packages/prod/config.yaml; \
+		docker pull $(DIN):$(DIV); \
 		docker compose -f ./src/docker-compose.yml --env-file ./src/.env up -d; \
 	else \
-		"\033[31mDirectory not found, setting up project...\033[0m"; \
-		mkdir -p /var/docker/dclm-academy; \
-		cd /var/docker/dclm-academy; \
-		git clone https://github.com/dclmict/dclm-academy.git .; \
+		echo "\033[31mDirectory not found, setting up project...\033[0m"; \
+		mkdir -p /var/docker/dclm-dam; \
+		cd /var/docker/dclm-dam; \
+		git clone https://github.com/dclmict/dclm-dam.git .; \
 		sudo chown -R ubuntu:ubuntu .; \
 		touch ops/.env.prod; \
 		echo "\033[32mPaste .env content and save with :wq\033[0m"; \
 		vim ops/.env.prod; \
 		cp ./ops/.env.prod ./src/.env; \
 		cp ./docker-prod.yml ./src/docker-compose.yml; \
+		cp -f ops/config-prod.yaml src/config/packages/prod/config.yaml; \
+		docker pull $(DIN):$(DIV); \
 		docker compose -f ./src/docker-compose.yml --env-file ./src/.env up -d; \
 	fi
 
@@ -112,10 +136,10 @@ destroy:
 	docker compose -f ./src/docker-compose.yml --env-file ./src/.env down --volumes
 
 shell:
-	docker compose -f ./src/docker-compose.yml --env-file ./src/.env exec -it academy-app bash
+	docker compose -f ./src/docker-compose.yml --env-file ./src/.env exec -it $(CN) bash
 
 ps:
 	docker compose -f ./src/docker-compose.yml ps
 
 log:
-	docker compose -f ./src/docker-compose.yml --env-file ./src/.env logs -f academy-app
+	docker compose -f ./src/docker-compose.yml --env-file ./src/.env logs -f $(CN)

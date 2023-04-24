@@ -1,0 +1,20 @@
+services:
+  dam-app:
+    container_name: ${CN}
+    image: ${DIN}:${DIV}
+    env_file: .env
+    restart: unless-stopped
+    ports:
+      - "1009:443"
+    networks:
+      - bams
+    volumes:
+      - .:/var/www/html
+      - ../ops/docker/php/php-dev.ini:/usr/local/etc/php/conf.d/20-pimcore.ini
+      - ~/dev/keys/mac/bams.pem:/var/ssl/cert.pem
+      - ~/dev/keys/mac/bams-key.pem:/var/ssl/key.pem
+
+networks:
+  bams:
+    name: bams
+    external: true

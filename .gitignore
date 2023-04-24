@@ -1,7 +1,13 @@
 # files
+.idea
+.DS_Store
 setup
-
-
+/ops/docker/pin
+/ops/.env.dev
+/ops/.env.prod
+# src folder
+/src/.env
+/src/docker-compose.yml
 
 # folders
 _

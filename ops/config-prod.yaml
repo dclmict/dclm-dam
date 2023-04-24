@@ -1,14 +1,17 @@
+imports:
+    - { resource: ../../config.yaml }
+
 pimcore:
     assets:
         frontend_prefixes:
-            source: https://s3.us-east-1.amazonaws.com/dclm-developers/dclm-pimcore/assets
-            thumbnail: https://s3.us-east-1.amazonaws.com/dclm-developers/dclm-pimcore/thumbnails
+            source: '%env(S3_URL)%/assets'
+            thumbnail: '%env(S3_URL)%/thumbnails'
 
 services:
     assets_s3:
         class: 'Aws\S3\S3Client'
         arguments:
-            -  endpoint: 'https://s3.us-east-1.amazonaws.com'
+            -  endpoint: '%env(S3_URL)%'
                region: 'us-east-1'
                version: 'latest'
                credentials:
