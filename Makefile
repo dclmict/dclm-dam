@@ -10,7 +10,7 @@ repo:
 		gh repo create dclmict/$$repo --public --source=. --remote=origin; \
 		echo "\033[31m Enter commit message\033[0m"; \
 		read -r cm; \
-		git add . && git commit -m '$$cm'; \
+		git add . && git commit -m "$$cm"; \
 		git push --set-upstream origin main; \
 	else \
 		echo "\033[31mPlease enter github repo name: \033[0m "; \
@@ -19,7 +19,7 @@ repo:
 		gh repo create dclmict/$$repo --public --source=. --remote=origin; \
 		echo "\033[31m Enter commit message\033[0m"; \
 		read -r cm; \
-		git add . && git commit -m '$$cm'; \
+		git add . && git commit -m "$$cm"; \
 		git push --set-upstream origin main; \
 	fi
 
