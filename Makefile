@@ -91,7 +91,7 @@ dev:
 	docker compose -f ./src/docker-compose.yml --env-file ./src/.env up -d
 
 prod:
-	@if ls /var/docker | grep -q dclm-dam; then \
+	@if [ -d .git ]; then \
 		echo "\033[31mDirectory exists, starting container...\033[0m"; \
 		touch ops/.env.prod; \
 		echo "\033[32mPaste .env content and save with :wq\033[0m"; \
@@ -103,8 +103,6 @@ prod:
 		docker compose -f ./src/docker-compose.yml --env-file ./src/.env up -d; \
 	else \
 		echo "\033[31mDirectory not found, setting up project...\033[0m"; \
-		mkdir -p /var/docker/dclm-dam; \
-		cd /var/docker/dclm-dam; \
 		git clone https://github.com/dclmict/dclm-dam.git .; \
 		sudo chown -R ubuntu:ubuntu .; \
 		touch ops/.env.prod; \
