@@ -82,7 +82,7 @@ build:
 
 push:
 	cp ./ops/.env.dev ./src/.env
-	${DLP} | docker login -u opeoniye --password-stdin
+	echo ${DLP} | docker login -u opeoniye --password-stdin
 	docker push $(DIN):$(DIV)
 
 dev:

@@ -3,7 +3,7 @@ services:
 		container_name: ${CN}
 		image: ${DIN}:${DIV}
 		env_file: .env
-		restart: unless_stopped	
+		restart: unless-stopped	
 		ports:
 			- "1009:443"
 		networks:
