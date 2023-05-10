@@ -9,6 +9,7 @@ services:
 		networks:
 			- dclm
 		volumes:
+			- .:/var/www/html
 			- ../ops/config-prod.yaml:/var/www/html/config/packages/prod/config.yaml
 			- ../ops/redis.yml:/var/www/html/config/packages/cache.yaml
 			- /etc/letsencrypt/live/dclm.org/fullchain.pem:/var/ssl/cert.pem

@@ -22,6 +22,7 @@ Dockerfile
 /src/.web-server-pid
 /src/build/
 /src/phpunit.xml
+/src/public/var/
 /src/public/bundles/
 /src/public/sitemap*.xml
 
@@ -33,6 +34,8 @@ Dockerfile
 /src/.env.*.local
 /src/docker-compose.yml
 /src/docker-compose.override.yml
+/src/config/packages/cache.yaml
+/src/config/pimcore/constants.php
 /src/cache
 
 !/src/config/local
@@ -40,7 +43,7 @@ Dockerfile
 
 /src/dev/
 
-/src/var
+/src/var/*
 !/src/var/.gitkeep
 !/src/var/classes/
 /src/var/classes/DataObject
@@ -50,5 +53,17 @@ Dockerfile
 /src/var/config/maintenance.php
 /src/var/config/tag-manager.php
 
-/src/vendor
+/src/vendor/
 /src/node_modules
+
+# PHP-CS-Fixer
+/src/.php-cs-fixer.php
+/src/.php-cs-fixer.cache
+
+# PhpStorm / IDEA
+/src/.idea
+# NetBeans
+/src/nbproject
+
+# temp
+/src/.temp

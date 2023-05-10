@@ -86,14 +86,9 @@ COPY ./ops/docker/ngx/log.conf /etc/nginx/snippets/logging.conf
 WORKDIR /var/www/html
 
 # copy code
-COPY --chown=www-data:www-data ./src /var/www/html
+# COPY --chown=www-data:www-data ./src /var/www/html
 
-RUN usermod -a -G www-data root; \
-  chown -R www-data:www-data .; \ 
-  find . -type d -exec chmod 2775 {} \;; \
-  find . -type f -exec chmod 0664 {} \;; \
-  chmod +x bin/console; \
-  chmod gu+rw /var/run; \
+RUN chmod gu+rw /var/run; \
   chmod gu+s /usr/sbin/cron; \
   chmod +x /var/docker/run.sh
 

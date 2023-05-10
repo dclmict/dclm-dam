@@ -11,10 +11,12 @@
 # Based on https://gist.github.com/2206527
 
 # deploy
-# echo "\033[31mSetting permissions\033[0m"
-# chown -R www-data:www-data .
-# find . -type d -exec chmod 2775 {} \;
-# find . -type f -exec chmod 0664 {} \;
+echo "\033[31mSetting permissions\033[0m"
+usermod -a -G www-data root
+chown -R www-data:www-data .
+find . -type d -exec chmod 2775 {} \;
+find . -type f -exec chmod 0664 {} \;
+chmod +x bin/console
 
 # start supervisord
 echo "\033[31mStarting all services with supervisord\033[0m"

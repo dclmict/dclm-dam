@@ -11,10 +11,11 @@ setup
 /ops/system.yml
 /ops/cache.yml
 
+# ops folder
+_
+/ops/kubernetes
+
 # src folder
 /src/.env
 /src/docker-compose.yml
-
-# folders
-_
-/ops/kubernetes
+/src/config/packages/cache.yaml
