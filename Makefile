@@ -67,9 +67,10 @@ git:
 
 build:
 	@if docker images | grep -q $(DIN); then \
-		echo "Removing \033[31m$(DIN)\033[0m image"; \
+		echo "\033[31mRemoving all dangling images\033[0m image"; \
 		echo y | docker image prune --filter="dangling=true"; \
-		docker image rm $(DIN); \
+		echo "\033[31mRemoving $(DIN):$(DIV) image\033[0m"; \
+		docker image rm $(DIN):$(DIV); \
 		echo "Building \033[31m$(DIN):$(DIV)\033[0m image"; \
 		docker build -t $(DIN):$(DIV) .; \
 		docker images | grep $(DIN); \
@@ -87,7 +88,6 @@ push:
 dev:
 	cp ./ops/.env.dev ./src/.env
 	cp ./docker-dev.yml ./src/docker-compose.yml
-	cp -f ops/config-dev.yaml src/config/packages/dev/config.yaml
 	docker compose -f ./src/docker-compose.yml --env-file ./src/.env up -d
 
 prod:
@@ -98,7 +98,6 @@ prod:
 		vim ops/.env.prod; \
 		cp ./ops/.env.prod ./src/.env; \
 		cp ./docker-prod.yml ./src/docker-compose.yml; \
-		cp -f ops/config-prod.yaml src/config/packages/prod/config.yaml; \
 		docker pull $(DIN):$(DIV); \
 		docker compose -f ./src/docker-compose.yml --env-file ./src/.env up -d; \
 	else \
@@ -110,7 +109,6 @@ prod:
 		vim ops/.env.prod; \
 		cp ./ops/.env.prod ./src/.env; \
 		cp ./docker-prod.yml ./src/docker-compose.yml; \
-		cp -f ops/config-prod.yaml src/config/packages/prod/config.yaml; \
 		docker pull $(DIN):$(DIV); \
 		docker compose -f ./src/docker-compose.yml --env-file ./src/.env up -d; \
 	fi

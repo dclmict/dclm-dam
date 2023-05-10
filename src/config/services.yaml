@@ -1,22 +1,11 @@
 parameters:
-    secret: l2EmGzfI49DzBf2I8pwgzu1llxLZvtE+rsH+TGDG694=
-    google_client_id: <google_client_id>
-    google_client_secret: <google_client_secret>
-    twitter_client_id: <twitter_client_id>
-    twitter_client_secret: <twitter_client_secret>
-    
-    # use echo \Defuse\Crypto\Key::createNewRandomKey()->saveToAsciiSafeString(); to generate secret for data encryption
-    app_encryption_secret: "t8sZfQmhU50aVWgxrfuoYurRBWjhdYqrcLTpW2eXcWQ="
-
-
-    #this is necessary for CLI commands to get the base url, eg. sitemap dump
-    router.request_context.host: demo.pimcore.fun
-    router.request_context.scheme: https
+    secret: md+DEYX+mdYGWFRvMibOn63dZ6p6YH8AVRYHsqPHeEI=
 
     # customize the full path to external executables
     # normally they are auto-detected by `which program` or auto-discovered in the configured path in
     # System Settings -> General -> Additional $PATH variable
     # but in general it's a good idea to have your programs in your $PATH environment variable (system wide)
+
     #pimcore_executable_composer: php /opt/vendor/bin/composer.phar
     #pimcore_executable_html2text: /usr/local/html2text/bin/html2text
     #pimcore_executable_soffice: /opt/libreoffice/bin/soffice
@@ -50,167 +39,37 @@ services:
         # this means you cannot fetch services directly from the container via $container->get()
         # if you need to do this, you can override this setting on individual services
         public: false
+    #
+    # CONTROLLERS
+    #
 
-
-    # ---------------------------------------------------------
-    # Register all controllers of App as services
-    # ---------------------------------------------------------
+    # auto-register all controllers as services
     App\Controller\:
         resource: '../src/Controller'
         public: true
-        tags: ['controller.service_arguments']
+        tags: [ 'controller.service_arguments' ]
 
 
+    #
+    # COMMANDS
+    #
 
-    # ---------------------------------------------------------
-    # Register all commands of App as commands
-    # ---------------------------------------------------------
+    # auto-register all commands as services
     App\Command\:
-        resource: '../src/Command'
-        tags: ['console.command']
+        resource: '../src/Command/*'
+        tags: [ 'console.command' ]
 
 
 
-    # ---------------------------------------------------------
-    # Forms
-    # ---------------------------------------------------------
-    App\Form\DeliveryAddressFormType: ~
-    App\Form\LoginFormType: ~
-    App\Form\RegistrationFormType: ~
-    App\Form\RegistrationFormHandler: ~
-    App\Form\CarSubmitFormType: ~
+    # Example custom templating helper
+    # App\Templating\Helper\Example:
+    #     # templating helpers need to be public as they
+    #     # are fetched from the container on demand
+    #     public: true
+    #     tags:
+    #         - { name: templating.helper, alias: fooBar }
 
-    # ---------------------------------------------------------
-    # Processors
-    # ---------------------------------------------------------
-    App\Sitemaps\Processors\AbsoluteURLProcessor: ~
-
-    # ---------------------------------------------------------
-    # Sitemaps
-    # ---------------------------------------------------------
-    App\Sitemaps\NewsGenerator:
-        arguments:
-            $processors:
-                - '@App\Sitemaps\Processors\AbsoluteURLProcessor'
-    App\Sitemaps\ProductGenerator:
-        arguments:
-            $processors:
-                - '@App\Sitemaps\Processors\AbsoluteURLProcessor'
-    App\Sitemaps\CategoryGenerator:
-        arguments:
-            $processors:
-                - '@App\Sitemaps\Processors\AbsoluteURLProcessor'
-
-    # ---------------------------------------------------------
-    # Misc Services
-    # ---------------------------------------------------------
-    App\Services\PasswordRecoveryService: ~
-    App\Services\NewsletterDoubleOptInService: ~
-    App\Services\SegmentTrackingHelperService: ~
-    App\Services\Workflow\CustomHtmlService: ~
-    App\Website\Navigation\BreadcrumbHelperService: ~
-
-    App\Model\Product\CalculatedValue\QualityCalculator:
-        public: true
-
-    App\Model\Product\CalculatedValue\AccessoryPartName:
-        public: true
-
-
-    # ---------------------------------------------------------
-    # Twig Extensions
-    # ---------------------------------------------------------
-    App\Twig\Extension\CategoryFilterExtension:
-        tags: ['twig.extension']
-
-    App\Twig\Extension\Country:
-        tags: ['twig.extension']
-
-    App\Twig\Extension\Currency:
-        tags: ['twig.extension']
-
-    App\Twig\Extension\GeneralFilterExtension:
-        tags: ['twig.extension']
-
-    App\Twig\Extension\NavigationExtension:
-        tags: ['twig.extension']
-
-    App\Twig\Extension\UniqidExtension:
-        tags: ['twig.extension']
-
-    App\Twig\Extension\LanguageSwitcherExtension:
-        tags: ['twig.extension']
-
-    App\Twig\Extension\ProductPageExtension:
-        tags: ['twig.extension']
-
-    App\Twig\Extension\NewsExtension:
-        tags: ['twig.extension']
-
-    App\Twig\Extension\PrintCatalogExtension:
-        tags: ['twig.extension']
-
-
-    # ---------------------------------------------------------
-    # Link Generators for DataObjects
-    # ---------------------------------------------------------
-    App\Website\LinkGenerator\CategoryLinkGenerator:
-        public: true
-
-    App\Website\LinkGenerator\ProductLinkGenerator:
-        public: true
-
-    App\Website\LinkGenerator\NewsLinkGenerator:
-        public: true
-
-
-
-    # ---------------------------------------------------------
-    # Overwrite Pimcore Default Services
-    # ---------------------------------------------------------
-
-    # overwrite PimcoreUrl helper to add existing parameters to generated urls
-    Pimcore\Twig\Extension\Templating\PimcoreUrl:
-        class: App\Website\Tool\PimcoreUrl
-        arguments:
-            $generator: '@router'
-
-
-
-    # ---------------------------------------------------------
-    # Event Listeners
-    # ---------------------------------------------------------
-
-    # auto sets name based on key for bodystyle, manufacturer, category
-    App\EventListener\NameSettingListener:
-        tags:
-            - { name: kernel.event_listener, event: pimcore.dataobject.preAdd, method: onPreAdd }
-
-    # adds additional static files to admin backend
-    App\EventListener\PimcoreAdminListener:
-        tags:
-            - { name: kernel.event_listener, event: pimcore.bundle_manager.paths.css, method: addCSSFiles }
-            - { name: kernel.event_listener, event: pimcore.bundle_manager.paths.js, method: addJSFiles }
-            - { name: kernel.event_listener, event: pimcore.admin.resolve.elementAdminStyle, method: onResolveElementAdminStyle }
-
-    # checkout listeners for ecommerce application
-    App\EventListener\CheckoutEventListener:
-        tags:
-            - { name: kernel.event_listener, event: pimcore.ecommerce.ordermanager.postUpdateOrder, method: onUpdateOrder }
-            - { name: kernel.event_listener, event: pimcore.ecommerce.commitorderprocessor.sendConfirmationMails, method: sendConfirmationMail }
-            - { name: kernel.event_listener, event: pimcore.ecommerce.commitorderprocessor.postCommitOrder, method: postCommitOrder }
-
-    # authentication login listener for updating e-commerce framework environment after login
-    App\EventListener\AuthenticationLoginListener: ~
-
-    # authentication login listener for updating e-commerce framework environment after logout
-    App\EventListener\AuthenticationLogoutListener: ~
-
-
-
-
-    # ---------------------------------------------------------
-    # Workflow
-    # ---------------------------------------------------------
-    App\Workflow\SupportsStrategy: ~
-
+    # Example event listener for objects
+    # App\EventListener\TestListener:
+    #     tags:
+    #         - { name: kernel.event_listener, event: pimcore.dataobject.preUpdate, method: onObjectPreUpdate }

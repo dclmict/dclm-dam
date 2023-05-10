@@ -15,16 +15,12 @@
 
 namespace App\Controller;
 
-use App\Model\Product\AbstractProduct;
-use App\Model\Product\Car;
-use Pimcore\Model\DataObject\AbstractObject;
+use Pimcore\Controller\FrontendController;
 use Pimcore\Model\Document\Hardlink;
-use Pimcore\Web2Print\Processor;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
 
-class Web2printController extends BaseController
+class Web2printController extends FrontendController
 {
     /**
      * @param Request $request
@@ -41,7 +37,7 @@ class Web2printController extends BaseController
             $paramsBag[$key] = $value;
         }
 
-        $paramsBag = array_merge($this->getAllParameters($request), $paramsBag);
+        $paramsBag = array_merge($request->request->all(), $request->query->all(), $paramsBag);
 
         if ($this->document->getProperty('hide-layout')) {
             return $this->render('web2print/default_no_layout.html.twig', $paramsBag);
@@ -51,7 +47,6 @@ class Web2printController extends BaseController
     }
 
     /**
-     *
      * @param Request $request
      *
      * @return Response
@@ -84,55 +79,5 @@ class Web2printController extends BaseController
         $paramsBag['allChildren'] = $allChildren;
 
         return $this->render('web2print/container.html.twig', $paramsBag);
-    }
-
-    /**
-     * @param Request $request
-     *
-     * @return Response
-     *
-     * @throws \Exception
-     */
-    public function productCellAction(Request $request)
-    {
-        AbstractObject::setGetInheritedValues(true);
-        $product = AbstractProduct::getById($request->get('id'));
-        $paramsBag['product'] = $product;
-
-        return $this->render('web2print/product_cell.html.twig', $paramsBag);
-    }
-
-    /**
-     * @param Request $request
-     * @Route("/product-print", name="product_print")
-     *
-     * @return Response
-     *
-     * @throws \Exception
-     */
-    public function productPrintAction(Request $request)
-    {
-        $objId = $request->get('id');
-        $obj = Car::getById($objId);
-
-        if ($obj instanceof Car) {
-            $params = $this->getAllParameters($request);
-            $params['product'] = $obj;
-            $html = $this->renderView('web2print/product_detail.html.twig', $params);
-
-            if ($request->get('html')) {
-                return new Response($html);
-            } else {
-                $adapter = Processor::getInstance();
-
-                if ($html) {
-                    return new Response(
-                        $adapter->getPdfFromString($html),
-                        200,
-                        ['Content-Type' => 'application/pdf']
-                    );
-                }
-            }
-        }
     }
 }

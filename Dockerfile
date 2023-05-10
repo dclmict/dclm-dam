@@ -69,11 +69,12 @@ COPY --from=composer/composer:2-bin /composer /usr/bin/composer
 FROM pimcore_php_fpm as pimcore_php_supervisord
 
 # install nginx, supervisor, cron
-RUN apt-get update && apt-get install -y nginx supervisor cron
+RUN apt-get update && apt-get install -y nginx supervisor redis-server cron
 
 # copy config/scripts
 COPY ./ops/docker/run.sh /var/docker/run.sh
 COPY ./ops/docker/php/php-prod.ini /usr/local/etc/php/conf.d/20-pimcore.ini
+COPY ./ops/docker/php/fpm.conf /usr/local/etc/php-fpm.d/www.conf
 COPY ./ops/docker/supervisord.conf /etc/supervisord.conf
 COPY ./ops/docker/ngx/nginx.conf /etc/nginx/nginx.conf
 COPY ./ops/docker/ngx/dam.conf /etc/nginx/sites-enabled/default
@@ -88,6 +89,9 @@ WORKDIR /var/www/html
 COPY --chown=www-data:www-data ./src /var/www/html
 
 RUN usermod -a -G www-data root; \
+  chown -R www-data:www-data .; \ 
+  find . -type d -exec chmod 2775 {} \;; \
+  find . -type f -exec chmod 0664 {} \;; \
   chmod +x bin/console; \
   chmod gu+rw /var/run; \
   chmod gu+s /usr/sbin/cron; \

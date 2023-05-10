@@ -2,9 +2,15 @@
 .idea
 .DS_Store
 setup
+.cache_ggshield
 /ops/docker/pin
 /ops/.env.dev
 /ops/.env.prod
+/ops/db-dev.yaml
+/ops/db-prod.yaml
+/ops/system.yml
+/ops/cache.yml
+
 # src folder
 /src/.env
 /src/docker-compose.yml

@@ -1,18 +1,18 @@
 services:
-dam-app:
-	container_name: ${CN}
-	image: ${DIN}:${DIV}
-	env_file: .env
-	restart: unless_stopped	
-	ports:
-	  - "1009:443"
-	networks:
-		- dclm
-	volumes:
-		- ./ops/config-dev.yaml:/var/www/html/config/packages/prod/config.yaml
-	  - /etc/letsencrypt/live/dclm.org/fullchain.pem:/var/ssl/cert.pem
-    - /etc/letsencrypt/live/dclm.org/privkey.pem:/var/ssl/key.pem
-		- ./ops/config-prod.yaml:/var/www/html/config/packages/prod/config.yaml
+	dam-app:
+		container_name: ${CN}
+		image: ${DIN}:${DIV}
+		env_file: .env
+		restart: unless_stopped	
+		ports:
+			- "1009:443"
+		networks:
+			- dclm
+		volumes:
+			- ../ops/config-prod.yaml:/var/www/html/config/packages/prod/config.yaml
+			- ../ops/redis.yml:/var/www/html/config/packages/cache.yaml
+			- /etc/letsencrypt/live/dclm.org/fullchain.pem:/var/ssl/cert.pem
+			- /etc/letsencrypt/live/dclm.org/privkey.pem:/var/ssl/key.pem
 
 networks:
   dclm:
