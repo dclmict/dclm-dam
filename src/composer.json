@@ -8,7 +8,7 @@
     "process-timeout": 0
   },
   "require": {
-    "league/flysystem-aws-s3-v3": "^3.13",
+    "league/flysystem-aws-s3-v3": "*",
     "pimcore/pimcore": "^10.5"
   },
   "require-dev": {

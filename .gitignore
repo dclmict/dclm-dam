@@ -17,6 +17,9 @@ _
 /ops/kubernetes
 
 # src folder
+/src/.github
+/src/.docker
+/src/cache
 /src/.env
 /src/docker-compose.yml
 /src/config/packages/cache.yaml

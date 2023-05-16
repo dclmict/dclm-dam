@@ -10,6 +10,7 @@ services:
       - bams
     volumes:
       - .:/var/www/html
+      - ~/dev/devops/scripts:/play
       - ../ops/docker/php/php-dev.ini:/usr/local/etc/php/conf.d/20-pimcore.ini
       - ../ops/config-dev.yaml:/var/www/html/config/packages/prod/config.yaml
       - ../ops/redis.yml:/var/www/html/config/packages/cache.yaml

@@ -132,10 +132,15 @@ destroy:
 	docker compose -f ./src/docker-compose.yml --env-file ./src/.env down --volumes
 
 shell:
-	docker compose -f ./src/docker-compose.yml --env-file ./src/.env exec -it $(CN) bash
+	docker compose -f ./src/docker-compose.yml --env-file ./src/.env exec $(CN) bash
 
 ps:
 	docker compose -f ./src/docker-compose.yml ps
 
 log:
 	docker compose -f ./src/docker-compose.yml --env-file ./src/.env logs -f $(CN)
+
+run:
+	@echo "\033[31mEnter command to run inside container: \033[0m"; \
+	read -r cmd; \
+	docker compose -f ./src/docker-compose.yml exec $(CN) bash -c "$$cmd"
