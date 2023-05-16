@@ -9,4 +9,4 @@ framework:
         #adapter: pimcore.cache.adapter.doctrine_dbal
         #provider: 'doctrine.dbal.default_connection'
         adapter: pimcore.cache.adapter.redis_tag_aware
-        provider: '127.0.0.1:6379'
+        provider: 'redis://localhost'
