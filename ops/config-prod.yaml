@@ -11,7 +11,7 @@ services:
     assets_s3:
         class: 'Aws\S3\S3Client'
         arguments:
-            -  endpoint: '%env(S3_URL)%'
+            -  endpoint: 'https://s3.us-east-1.amazonaws.com'
                region: 'us-east-1'
                version: 'latest'
                credentials:
